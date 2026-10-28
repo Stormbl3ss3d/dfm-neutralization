@@ -1,0 +1,27 @@
+# Virtual Environments
+venv/
+.venv/
+env/
+
+# Large Datasets (Keep locally, do not push to GitHub)
+data/
+*.zip
+
+# Model Checkpoints & Weights (>100MB limit)
+checkpoints/
+flow_matching/examples/text/outputs/
+flow_matching/examples/text/data_cache/
+*.pth
+*.pt
+*.bin
+*.safetensors
+*.pkl
+
+# Python & OS Cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+build/
+dist/
+.DS_Store

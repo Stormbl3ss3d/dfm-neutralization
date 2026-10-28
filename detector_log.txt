@@ -1,0 +1,50 @@
+device: mps
+Loading weights:   0%|          | 0/101 [00:00<?, ?it/s]Loading weights: 100%|██████████| 101/101 [00:00<00:00, 7839.24it/s]
+[transformers] [1mRobertaForSequenceClassification LOAD REPORT[0m from: distilroberta-base
+Key                         | Status     | 
+----------------------------+------------+-
+roberta.pooler.dense.weight | UNEXPECTED | 
+lm_head.bias                | UNEXPECTED | 
+lm_head.layer_norm.weight   | UNEXPECTED | 
+lm_head.layer_norm.bias     | UNEXPECTED | 
+lm_head.dense.bias          | UNEXPECTED | 
+roberta.pooler.dense.bias   | UNEXPECTED | 
+lm_head.dense.weight        | UNEXPECTED | 
+classifier.out_proj.bias    | MISSING    | 
+classifier.dense.weight     | MISSING    | 
+classifier.out_proj.weight  | MISSING    | 
+classifier.dense.bias       | MISSING    | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+- MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+step 100/2500 loss 0.6970 elapsed 0.7m eta 17.6m
+step 200/2500 loss 0.6843 elapsed 1.4m eta 16.6m
+step 300/2500 loss 0.6449 elapsed 2.1m eta 15.7m
+step 400/2500 loss 0.5673 elapsed 2.9m eta 15.0m
+step 500/2500 loss 0.6344 elapsed 3.6m eta 14.4m
+step 600/2500 loss 0.5662 elapsed 4.3m eta 13.7m
+step 700/2500 loss 0.5892 elapsed 5.0m eta 12.9m
+step 800/2500 loss 0.5236 elapsed 5.7m eta 12.2m
+step 900/2500 loss 0.6377 elapsed 6.4m eta 11.4m
+step 1000/2500 loss 0.4367 elapsed 7.1m eta 10.7m
+step 1100/2500 loss 0.6619 elapsed 7.9m eta 10.0m
+step 1200/2500 loss 0.5699 elapsed 8.6m eta 9.3m
+[dev] sentence acc 0.719  F1(biased) 0.689  pairwise acc 0.850
+step 1300/2500 loss 0.4782 elapsed 9.3m eta 8.6m
+step 1400/2500 loss 0.4498 elapsed 10.0m eta 7.9m
+step 1500/2500 loss 0.5608 elapsed 10.8m eta 7.2m
+step 1600/2500 loss 0.7381 elapsed 11.5m eta 6.4m
+step 1700/2500 loss 0.4980 elapsed 12.2m eta 5.7m
+step 1800/2500 loss 0.5702 elapsed 12.9m eta 5.0m
+step 1900/2500 loss 0.5437 elapsed 13.6m eta 4.3m
+step 2000/2500 loss 0.4655 elapsed 14.3m eta 3.6m
+step 2100/2500 loss 0.5221 elapsed 15.1m eta 2.9m
+step 2200/2500 loss 0.6243 elapsed 15.8m eta 2.2m
+step 2300/2500 loss 0.5562 elapsed 16.6m eta 1.4m
+step 2400/2500 loss 0.5037 elapsed 17.3m eta 0.7m
+step 2500/2500 loss 0.5382 elapsed 18.0m eta 0.0m
+[dev] sentence acc 0.713  F1(biased) 0.695  pairwise acc 0.841
+[test] sentence acc 0.720  F1(biased) 0.704  pairwise acc 0.827
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00,  5.54it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00,  5.53it/s]
+saved to /Users/Jeeva/dfm-neutralization/checkpoints/detector
