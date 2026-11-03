@@ -4,7 +4,7 @@ venv/
 env/
 
 # Large Datasets (Keep locally, do not push to GitHub)
-data/
+/data/
 *.zip
 
 # Model Checkpoints & Weights (>100MB limit)
