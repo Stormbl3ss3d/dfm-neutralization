@@ -70,6 +70,51 @@ def run_train(rank: int, cfg: OmegaConf) -> None:
     num_parameters = sum(p.numel() for p in model.parameters())
     logger.info(f"Number of parameters in the model: {num_parameters}")
 
+    # ==========================================
+    # WARM-START INJECTION: distilroberta-base
+    # ==========================================
+    logger.info("Injecting pretrained distilroberta-base weights into custom DFM Transformer...")
+    from transformers import AutoModelForMaskedLM
+    pretrained = AutoModelForMaskedLM.from_pretrained("distilroberta-base")
+    pretrained_state = pretrained.state_dict()
+    dfm_state = model.state_dict()
+    mapped_state = {}
+
+    # Map Token Embeddings
+    mapped_state['vocab_embed.weight'] = pretrained_state['roberta.embeddings.word_embeddings.weight']
+    mapped_state['output_layer.linear.weight'] = pretrained_state['roberta.embeddings.word_embeddings.weight']
+    mapped_state['output_layer.norm_final.weight'] = pretrained_state['roberta.encoder.layer.5.output.LayerNorm.weight']
+
+    # Map Transformer Blocks (DistilRoBERTa has 6 layers)
+    for i in range(6):
+        # Attention Q,K,V (RoBERTa uses a single query, key, value matrix)
+        mapped_state[f'blocks.{i}.qw.weight'] = pretrained_state[f'roberta.encoder.layer.{i}.attention.self.query.weight']
+        mapped_state[f'blocks.{i}.kw.weight'] = pretrained_state[f'roberta.encoder.layer.{i}.attention.self.key.weight']
+        mapped_state[f'blocks.{i}.vw.weight'] = pretrained_state[f'roberta.encoder.layer.{i}.attention.self.value.weight']
+        
+        # Attention Out
+        mapped_state[f'blocks.{i}.attn_out.weight'] = pretrained_state[f'roberta.encoder.layer.{i}.attention.output.dense.weight']
+        
+        # MLPs
+        mapped_state[f'blocks.{i}.mlp.0.weight'] = pretrained_state[f'roberta.encoder.layer.{i}.intermediate.dense.weight']
+        mapped_state[f'blocks.{i}.mlp.0.bias'] = pretrained_state[f'roberta.encoder.layer.{i}.intermediate.dense.bias']
+        mapped_state[f'blocks.{i}.mlp.2.weight'] = pretrained_state[f'roberta.encoder.layer.{i}.output.dense.weight']
+        mapped_state[f'blocks.{i}.mlp.2.bias'] = pretrained_state[f'roberta.encoder.layer.{i}.output.dense.bias']
+        
+        # Layer Norms
+        mapped_state[f'blocks.{i}.norm1.weight'] = pretrained_state[f'roberta.encoder.layer.{i}.attention.output.LayerNorm.weight']
+        mapped_state[f'blocks.{i}.norm2.weight'] = pretrained_state[f'roberta.encoder.layer.{i}.output.LayerNorm.weight']
+
+    # Keep the custom Flow Matching weights (like time modulation) untouched
+    for name, param in dfm_state.items():
+        if name not in mapped_state:
+            mapped_state[name] = param
+
+    # Load the mapped weights into the model
+    model.load_state_dict(mapped_state)
+    logger.info("Successfully loaded pretrained English semantics.")
+    # ==========================================
+
     # NEW: Removed DDP wrap. Just log the standard model.
     logger.info(model)
 
