@@ -214,7 +214,7 @@ def main():
         solver = MixtureDiscreteEulerSolver(model=wrapped, path=path, vocabulary_size=tokenizer.vocab_size)
         with torch.no_grad():
             sample = solver.sample(x_init=x_init, step_size=1.0 / args.steps,
-                                   time_grid=torch.tensor([0.0, 1.0]), dtype_categorical=torch.float64)
+                                   time_grid=torch.tensor([0.0, 1.0]), dtype_categorical=torch.float32 if device.type == "mps" else torch.float64)
         for j, r in enumerate(chunk):
             s, n = int(starts[j]), int(budgets[j])
             hyp = tokenizer.decode(sample[j, s: s + n], skip_special_tokens=True).strip() if keep[j] else r["src"]
