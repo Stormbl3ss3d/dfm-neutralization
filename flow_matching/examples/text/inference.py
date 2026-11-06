@@ -41,6 +41,7 @@ class GuidedWrappedModel(ModelWrapper):
         steered_logits = logits.detach() - (self.guidance_scale * normalized_gradients)
         steered_probs = torch.softmax(steered_logits, dim=-1)
         
+        # Lock the prompt and padding tokens back into place
         steered_probs[~self.target_mask] = 0.0
         prompt_indices = self.prompt_ids[~self.target_mask]
         steered_probs[~self.target_mask, prompt_indices] = 1.0
@@ -87,7 +88,7 @@ def main():
         prompt_enc = tokenizer(prompt_text, add_special_tokens=False)["input_ids"]
         
         input_enc = tokenizer(text, add_special_tokens=False)["input_ids"]
-        target_budget = len(input_enc) + 5
+        target_budget = len(input_enc)# strict length matching for now;
         
         prefix_ids = [tokenizer.cls_token_id] + prompt_enc + [tokenizer.sep_token_id]
         target_start_idx = len(prefix_ids)
