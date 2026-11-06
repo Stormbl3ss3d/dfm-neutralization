@@ -208,7 +208,8 @@ def run_train(rank: int, cfg: OmegaConf) -> None:
 
         state.step = state.step + 1
 
-    if state.step == num_train_steps:
+    # the loop exits with state.step == num_train_steps + 1, so the old `==` check never fired
+    if num_train_steps % cfg.training.snapshot != 0:
         logger.info("Saving checkpoint...", step=state.step)
         state.save_checkpoint(ckpt_dir=work_dirs.checkpoint, rank=rank)
 

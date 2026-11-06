@@ -69,9 +69,10 @@ def infill(text, span, orig):
     logits = mlm(**enc).logits[0, pos[0, 0]]
     cands = [mlm_tok.decode([t]).strip().lower() for t in torch.topk(logits, 30).indices.tolist()]
     cands = [c for c in cands if c]
-    unc = cands[0] if cands else orig
-    excl = next((c for c in cands if c != orig.lower()), orig)
-    return unc, excl
+    unc = cands[0] if cands else orig.lower()
+    excl = next((c for c in cands if c != orig.lower()), orig.lower())
+    case = (lambda w: w[:1].upper() + w[1:]) if orig[:1].isupper() else (lambda w: w)  # keep the original capitalisation
+    return case(unc), case(excl)
 
 
 @torch.no_grad()
@@ -88,13 +89,13 @@ hyps = {m: [] for m in methods}
 hit1, restore_det, restore_gold, ex_rows = [], [], [], []
 
 for n, r in enumerate(test):
-    src = r["src"]; sw = words(src) if False else TOKEN_RE.findall(src)
+    src = r["src"]; sw = TOKEN_RE.findall(src)
     ws, spans = word_scores(src)
     top = int(np.argmax(ws)); gold = r["gold_idx"][0] if r["gold_idx"] else top
     hit1.append(int(top in set(r["gold_idx"])))
     unc_d, excl_d = infill(src, spans[top], sw[top])
     unc_g, excl_g = infill(src, spans[gold], sw[gold])
-    restore_det.append(int(unc_d == sw[top].lower())); restore_gold.append(int(unc_g == sw[gold].lower()))
+    restore_det.append(int(unc_d.lower() == sw[top].lower())); restore_gold.append(int(unc_g.lower() == sw[gold].lower()))
     hyps["copy"].append(src)
     hyps["delete_top1"].append(apply(src, spans[top], ""))
     hyps["infill_top1_unc"].append(apply(src, spans[top], unc_d))

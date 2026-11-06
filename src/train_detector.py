@@ -9,6 +9,8 @@ PROC = ROOT / "data/processed"
 ap = argparse.ArgumentParser()
 ap.add_argument("--model", default="distilroberta-base")
 ap.add_argument("--n_pairs", type=int, default=20000)
+ap.add_argument("--skip", type=int, default=0, help="skip the first N shuffled pairs (use 20000 to train a judge on pairs the detector never saw)")
+ap.add_argument("--seed", type=int, default=0)
 ap.add_argument("--epochs", type=int, default=1)
 ap.add_argument("--bs", type=int, default=32)
 ap.add_argument("--lr", type=float, default=2e-5)
@@ -16,7 +18,7 @@ ap.add_argument("--max_len", type=int, default=128)
 ap.add_argument("--out", default=str(ROOT / "checkpoints/detector"))
 args = ap.parse_args()
 
-random.seed(0); torch.manual_seed(0)
+random.seed(0); torch.manual_seed(args.seed)  # data order seed stays 0 so --skip gives disjoint pairs
 device = "cuda" if torch.cuda.is_available() else ("mps" if torch.backends.mps.is_available() else "cpu")
 print("device:", device)
 
@@ -25,7 +27,7 @@ def load(split):
     return [json.loads(l) for l in open(PROC / f"{split}.jsonl")]
 
 
-train = load("train"); random.shuffle(train); train = train[: args.n_pairs]
+train = load("train"); random.shuffle(train); train = train[args.skip: args.skip + args.n_pairs]
 data = [(r["src"], 1) for r in train] + [(r["tgt"], 0) for r in train]
 
 tok = AutoTokenizer.from_pretrained(args.model)
