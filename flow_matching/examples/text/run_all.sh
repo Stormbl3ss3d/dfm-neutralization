@@ -15,8 +15,6 @@ run --length oracle          --out $R/dfm_oracle.jsonl
 # 2. guidance + NFE sweep, first 200 sentences (guided runs are slower)
 run --n 200 --length detector_delete                                     --out $R/g200_detdel_none.jsonl
 run --n 200 --length detector_delete --guidance logit  --guidance_scale 2   --out $R/g200_detdel_logit2.jsonl
-run --n 200 --length detector_delete --guidance taylor --guidance_scale 10  --out $R/g200_detdel_taylor10.jsonl
-run --n 200 --length detector_delete --guidance taylor --guidance_scale 100 --out $R/g200_detdel_taylor100.jsonl
 run --n 200 --length detector_delete --steps 32                          --out $R/g200_detdel_nfe32.jsonl
 
 # 3. tables
