@@ -88,11 +88,13 @@ cd flow_matching/examples/text
 python inference.py --checkpoint_path PATH/TO/checkpoint.pth --length src --input_text "the avalanche lost to the underdog minnesota wild in the playoffs."
 ```
 
+
 ## Limitations and next steps
 
 - The DFM cannot choose its output length. Training with the target padded to the source length would let it learn to emit padding, and therefore to delete.
 - The guidance classifier is trained on clean text and applied to partly uncertain predictions; a classifier trained on noisy inputs (Nisonoff et al.) is the principled alternative.
 - Results are from one seed; several seeds and a human spot check would make the comparison more reliable.
+
 
 ## References
 
@@ -102,6 +104,7 @@ python inference.py --checkpoint_path PATH/TO/checkpoint.pth --length src --inpu
 - Lipman et al. *Flow Matching Guide and Code.* [arXiv:2412.06264](https://arxiv.org/abs/2412.06264)
 - Sundararajan et al. *Axiomatic Attribution for Deep Networks.* ICML 2017. [arXiv:1703.01365](https://arxiv.org/abs/1703.01365)
 - Zhang et al. *BERTScore: Evaluating Text Generation with BERT.* ICLR 2020. [arXiv:1904.09675](https://arxiv.org/abs/1904.09675)
+
 
 ## Licences
 
